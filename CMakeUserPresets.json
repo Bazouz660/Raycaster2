@@ -1,0 +1,9 @@
+{
+    "version": 4,
+    "vendor": {
+        "conan": {}
+    },
+    "include": [
+        "C:\\Users\\stagiairelancier\\Documents\\Repo\\sfml_conan_raycaster\\build\\CMakePresets.json"
+    ]
+}

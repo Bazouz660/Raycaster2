@@ -1,0 +1,40 @@
+# Compiled object files
+*.o
+*.obj
+
+# Compiled dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled static libraries
+*.a
+*.lib
+
+# Compiled executables
+*.exe
+
+# Build directories
+build/
+bin/
+
+# Conan package directories
+conanbuildinfo.txt
+conanbuildinfo.cmake
+conaninfo.txt
+
+# CMake build directories
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Miscellaneous
+*.log
+*.swp
+*.swo
+*.DS_Store
