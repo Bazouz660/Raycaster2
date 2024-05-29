@@ -14,7 +14,7 @@ public:
     const sf::Texture &getTexture() const;
     virtual void update(float dt);
 
-private:
+protected:
     double x, y, z;
     const sf::Texture &texture;
 };

@@ -17,10 +17,11 @@ set(SOURCES
     src/Map.cpp
     src/Game.cpp
     src/Clock.cpp
+    src/TextureMap.cpp
     src/AEntity.cpp
     src/StaticEntity.cpp
     src/ItemEntity.cpp
-    src/TextureMap.cpp
+    src/EnemyEntity.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

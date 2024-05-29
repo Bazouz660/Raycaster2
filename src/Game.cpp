@@ -1,5 +1,6 @@
 #include "Game.hpp"
 #include "ItemEntity.hpp"
+#include "EnemyEntity.hpp"
 
 Game::Game() :
       player(20.0, 12.0, -1.0, 0.0, 0.0, 0.66),
@@ -20,8 +21,8 @@ Game::Game() :
     sf::Texture* entityTexture = new sf::Texture();
     entityTexture->loadFromFile("asset/entity.png");
 
-    ItemEntity entity1(20.0, 12.0, *entityTexture);
-    addEntity(std::make_shared<ItemEntity>(entity1));
+    EnemyEntity entity1(20.0, 12.0, *entityTexture, player, map);
+    addEntity(std::make_shared<EnemyEntity>(entity1));
 }
 
 void Game::lockMouse()
