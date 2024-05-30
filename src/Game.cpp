@@ -3,7 +3,7 @@
 #include "EnemyEntity.hpp"
 
 Game::Game() :
-      player(20.0, 12.0, -1.0, 0.0, 0.0, 0.66),
+      player(20.5, 13.0, -1.0, 0.0, 0.0, 0.66),
       map()
 {
     window.create(sf::VideoMode(screenWidth, screenHeight), "Raycasting");

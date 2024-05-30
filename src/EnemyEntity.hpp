@@ -1,5 +1,6 @@
 #include "AEntity.hpp"
 #include "Player.hpp"
+#include "Vector2.hpp"
 
 class EnemyEntity : public AEntity
 {
@@ -12,4 +13,6 @@ class EnemyEntity : public AEntity
         const Player &player;
         const Map &map;
         float speed = 1.0f;
+        Vector2f direction;
+        Vector2f velocity;
 };

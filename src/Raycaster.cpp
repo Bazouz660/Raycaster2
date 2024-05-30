@@ -19,8 +19,8 @@ void sortSprites(int* order, double* dist, int count) {
 
 Raycaster::Raycaster()
 {
-    env.fogStart = 5.0;
-    env.fogEnd = 15.0;
+    env.fogStart = 0.0;
+    env.fogEnd = 5.0;
 }
 
 void Raycaster::setSize(int width, int height)
@@ -279,7 +279,7 @@ void Raycaster::drawSprites(sf::RenderTarget &window, const Player &player, cons
         // Draw each stripe of the sprite
         for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
             int texX = int((stripe - (-spriteWidth / 2 + spriteScreenX)) * double(sprite->getTexture().getSize().x) / spriteWidth);
-            if (transformY > 0 && stripe > 0 && stripe < window.getSize().x && transformY < zBuffer[stripe]) { // Conditions to not draw behind walls
+            if (transformY > 0 && stripe > 0 && stripe < window.getSize().x && transformY < zBuffer[stripe]) { // Conditions to avoid drawing sprites behind walls
                 RenderSettings renderSettings = {spriteHeight, fogIntensity, 0};
                 TextureInfo textureInfo = {textureRect, sprite->getTexture(), texX, textureRect.height, drawStartY, drawEndY};
                 drawTexturedVerticalLine(window, stripe, drawStartYWithOffset, drawEndYWithOffset, textureInfo, renderSettings);
