@@ -22,8 +22,6 @@ void EnemyEntity::update(float dt) {
         if (!path.empty()) {
             // move to the first point in the path
             Point nextStep = path.front();
-            nextStep.x -= 0.5;
-            nextStep.y -= 0.5;
             direction = {nextStep.x - enemyPos.x, nextStep.y - enemyPos.y};
         }
     }

@@ -11,7 +11,9 @@ Game::Game() :
     window.create(sf::VideoMode(screenWidth, screenHeight), "Raycasting");
     lockMouse();
 
-    ImGui::SFML::Init(window, true);
+    ImGui::SFML::Init(window);
+    // set ImGui style
+    ImGui::StyleColorsDark();
 
     raycastViewport.create(resolutionX, resolutionY);
 
@@ -90,6 +92,7 @@ void Game::update()
     if (mouseLocked) // Reset mouse position to center
         sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 
+    ImGui::ShowDemoWindow();
     ImGui::Begin("Hello, world!");
     ImGui::Button("Look at this pretty button");
     ImGui::End();
