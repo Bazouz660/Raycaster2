@@ -1,14 +1,19 @@
 #include "Game.hpp"
 #include "ItemEntity.hpp"
 #include "EnemyEntity.hpp"
+#include "imgui-SFML.h"
+#include <imgui.h>
 
 Game::Game() :
       player(20.5, 13.0, -1.0, 0.0, 0.0, 0.66),
       map()
 {
     window.create(sf::VideoMode(screenWidth, screenHeight), "Raycasting");
-    raycastViewport.create(resolutionX, resolutionY);
     lockMouse();
+
+    ImGui::SFML::Init(window, true);
+
+    raycastViewport.create(resolutionX, resolutionY);
 
     font.loadFromFile("asset/arial.ttf");
     fpsCounter.setFont(font);
@@ -29,11 +34,13 @@ void Game::lockMouse()
 {
     sf::Mouse::setPosition(sf::Vector2i(resolutionX / 2, resolutionY / 2), window);
     window.setMouseCursorVisible(false);
+    mouseLocked = true;
 }
 
 void Game::unlockMouse()
 {
     window.setMouseCursorVisible(true);
+    mouseLocked = false;
 }
 
 void Game::computeDeltaTime()
@@ -61,9 +68,10 @@ void Game::processEvents()
     sf::Event event;
     while (window.pollEvent(event))
     {
-        if (event.type == sf::Event::LostFocus)
+        ImGui::SFML::ProcessEvent(window, event);
+        if (event.type == sf::Event::LostFocus || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::LControl))
             unlockMouse();
-        if (event.type == sf::Event::GainedFocus)
+        if (event.type == sf::Event::GainedFocus || (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::LControl))
             lockMouse();
         if (event.type == sf::Event::Closed)
             window.close();
@@ -73,10 +81,18 @@ void Game::processEvents()
 void Game::update()
 {
     computeDeltaTime();
+    ImGui::SFML::Update(window, sf::seconds(dt));
     for (auto &entity : entities) {
         entity->update(dt);
     }
     player.handleInput(map, window, dt);
+
+    if (mouseLocked) // Reset mouse position to center
+        sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
+
+    ImGui::Begin("Hello, world!");
+    ImGui::Button("Look at this pretty button");
+    ImGui::End();
 }
 
 void Game::render()
@@ -88,6 +104,7 @@ void Game::render()
     sf::RectangleShape rectangle(sf::Vector2f(screenWidth, screenHeight));
     rectangle.setTexture(&raycastViewport.getTexture());
     window.draw(rectangle);
+    ImGui::SFML::Render(window);
     window.draw(fpsCounter);
     window.display();
 }

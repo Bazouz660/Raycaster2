@@ -41,6 +41,7 @@ private:
     const int resolutionY = 600;
     const int screenWidth = 800;
     const int screenHeight = 600;
+    bool mouseLocked = true;
 };
 
 #endif // GAME_HPP

@@ -78,9 +78,6 @@ void Player::handleMouseMovement(int mouseXDelta, const sf::Window &window, floa
     double oldPlaneX = planeX;
     planeX = planeX * cos(actualRotSpeed) - planeY * sin(actualRotSpeed);
     planeY = oldPlaneX * sin(actualRotSpeed) + planeY * cos(actualRotSpeed);
-
-    // Reset mouse position to center
-    sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 }
 
 double Player::getPosX() const { return posX; }

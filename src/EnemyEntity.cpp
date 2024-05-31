@@ -22,16 +22,14 @@ void EnemyEntity::update(float dt) {
         if (!path.empty()) {
             // move to the first point in the path
             Point nextStep = path.front();
+            nextStep.x -= 0.5;
+            nextStep.y -= 0.5;
             direction = {nextStep.x - enemyPos.x, nextStep.y - enemyPos.y};
         }
     }
     direction = direction.normalize();
     velocity.x = speed * direction.x * dt;
     velocity.y = speed * direction.y * dt;
-
-    // check for collisions
-    // check if the entity will collide with a wall, if so, adjust the velocity to avoid the wall
-
 
     x += velocity.x;
     y += velocity.y;
