@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include <cmath>
+#include "Game.hpp"
 
 Player::Player(double posX, double posY, double dirX, double dirY, double planeX, double planeY)
     : posX(posX), posY(posY), dirX(dirX), dirY(dirY), planeX(planeX), planeY(planeY)
@@ -65,7 +66,7 @@ void Player::handleInput(const Map &map, const sf::Window &window, float dt)
 
 void Player::handleMouseMovement(int mouseXDelta, const sf::Window &window, float dt)
 {
-    if (!window.hasFocus())
+    if (!window.hasFocus() || !Game::isMouseLocked())
         return;
     double actualRotSpeed = rotSpeed * -mouseXDelta * dt;
 

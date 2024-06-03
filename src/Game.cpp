@@ -4,6 +4,15 @@
 #include "imgui-SFML.h"
 #include <imgui.h>
 
+bool my_tool_active = true;
+float my_color[4] = { 0.4f, 0.7f, 0.0f, 0.5f };
+
+Game &Game::getInstance()
+{
+    static Game game;
+    return game;
+}
+
 Game::Game() :
       player(20.5, 13.0, -1.0, 0.0, 0.0, 0.66),
       map()
@@ -14,14 +23,12 @@ Game::Game() :
     ImGui::SFML::Init(window);
     // set ImGui style
     ImGui::StyleColorsDark();
+    // load font
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF("asset/arial.ttf", 16.0f);
+    ImGui::SFML::UpdateFontTexture();
 
     raycastViewport.create(resolutionX, resolutionY);
-
-    font.loadFromFile("asset/arial.ttf");
-    fpsCounter.setFont(font);
-    fpsCounter.setCharacterSize(24);
-    fpsCounter.setFillColor(sf::Color::White);
-    fpsCounter.setPosition(10, 10);
 
     raycaster.setSize(resolutionX, resolutionY);
 
@@ -34,7 +41,6 @@ Game::Game() :
 
 void Game::lockMouse()
 {
-    sf::Mouse::setPosition(sf::Vector2i(resolutionX / 2, resolutionY / 2), window);
     window.setMouseCursorVisible(false);
     mouseLocked = true;
 }
@@ -50,9 +56,25 @@ void Game::computeDeltaTime()
     static float lastFrameTime = 0.0f;
     float currentFrameTime = clock.getElapsedTime();
     dt = currentFrameTime - lastFrameTime;
-    lastFrameTime = currentFrameTime;
 
-    fpsCounter.setString("FPS: " + std::to_string(int(1.0f / dt)));
+    fps = int(1.0f / dt);
+    maxFps = std::max(maxFps, fps);
+
+    frameTimes[frameCounter] = dt;
+
+    if (frameCounter == 99) {
+        float sum = 0.0f;
+        minFps = 5000000;
+        for (int i = 0; i < 100; i++) {
+            sum += frameTimes[i];
+            minFps = std::min(minFps, int(1.0f / frameTimes[i]));
+        }
+        avgFps = int(1.0f / (sum / 100.0f));
+    }
+
+
+    lastFrameTime = currentFrameTime;
+    frameCounter = (frameCounter + 1) % 100;
 }
 
 void Game::run()
@@ -92,10 +114,7 @@ void Game::update()
     if (mouseLocked) // Reset mouse position to center
         sf::Mouse::setPosition(sf::Vector2i(window.getSize().x / 2, window.getSize().y / 2), window);
 
-    ImGui::ShowDemoWindow();
-    ImGui::Begin("Hello, world!");
-    ImGui::Button("Look at this pretty button");
-    ImGui::End();
+    updateGUI();
 }
 
 void Game::render()
@@ -108,11 +127,28 @@ void Game::render()
     rectangle.setTexture(&raycastViewport.getTexture());
     window.draw(rectangle);
     ImGui::SFML::Render(window);
-    window.draw(fpsCounter);
     window.display();
+}
+
+void Game::updateGUI()
+{
+    // ImGui window to display current fps, average fps, max fps, min fps, frame time, and a frame time graph
+    ImGui::Begin("Stats", &my_tool_active, ImGuiWindowFlags_NoResize);
+    ImGui::Text("Current FPS: %d", fps);
+    ImGui::Text("Average FPS: %d", avgFps);
+    ImGui::Text("Max FPS: %d", maxFps);
+    ImGui::Text("Min FPS: %d", minFps);
+    ImGui::Text("Frame Time: %f", dt);
+    ImGui::PlotLines("Frame Times", frameTimes, IM_ARRAYSIZE(frameTimes), 0, NULL, 0.0f, 0.02f, ImVec2(0, 80));
+    ImGui::End();
 }
 
 void Game::addEntity(const std::shared_ptr<AEntity> &entity)
 {
     entities.push_back(entity);
+}
+
+bool Game::isMouseLocked()
+{
+    return getInstance().mouseLocked;
 }
