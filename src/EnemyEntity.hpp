@@ -1,6 +1,10 @@
+#pragma once
+
 #include "AEntity.hpp"
 #include "Player.hpp"
 #include "Vector2.hpp"
+#include <SFML/Audio.hpp>
+#include <memory>
 
 class EnemyEntity : public AEntity
 {
@@ -15,4 +19,5 @@ class EnemyEntity : public AEntity
         float speed = 1.0f;
         Vector2f direction;
         Vector2f velocity;
+        std::shared_ptr<sf::Sound> sound;
 };

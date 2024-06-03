@@ -7,10 +7,6 @@
 *.dylib
 *.dll
 
-# Compiled static libraries
-*.a
-*.lib
-
 # Compiled executables
 *.exe
 

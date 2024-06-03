@@ -49,8 +49,8 @@ public:
 
     using MapData = std::vector<std::vector<int>>;
 
-    static const int width = 24;
-    static const int height = 24;
+    int width = 24;
+    int height = 24;
     std::vector<MapData> levelData;
 
 private:
@@ -61,6 +61,8 @@ private:
     }
 
     void generateMaze();
+
+    void generateCorridor(unsigned int length);
 };
 
 #endif // MAP_HPP

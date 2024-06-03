@@ -113,7 +113,7 @@ Map::Map() : textureMap(16, 16)
         }
     }
 
-    generateMaze();
+    //generateCorridor(50);
 
     // Load the texture map
     textureMap.loadFromFile("asset/texture_map.png");
@@ -253,4 +253,53 @@ void Map::generateMaze() {
             }
         }
     }
+}
+
+// generate a corridor map with a given length
+void Map::generateCorridor(unsigned int length)
+{
+    width = length * 3;
+    height = 3;
+
+    levelData.resize(3);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        levelData[i].resize(width);
+        for (int j = 0; j < width; ++j)
+        {
+            levelData[i][j].resize(height);
+        }
+    }
+
+    for (int i = 0; i < width; ++i)
+    {
+        for (int j = 0; j < height; ++j)
+        {
+            levelData[0][i][j] = 0;
+            levelData[1][i][j] = 5;
+            levelData[2][i][j] = 6;
+        }
+    }
+
+    for (int i = 0; i < length; ++i)
+    {
+        levelData[0][i][1] = 6;
+        levelData[0][i][2] = 6;
+    }
+
+    levelData[0][length][1] = 0;
+    levelData[0][length][2] = 0;
+
+    levelData[0][length + 1][1] = 6;
+    levelData[0][length + 1][2] = 6;
+
+    for (int i = length + 2; i < width; ++i)
+    {
+        levelData[0][i][1] = 6;
+        levelData[0][i][2] = 6;
+    }
+
+    levelData[0][width - 1][1] = 0;
+    levelData[0][width - 1][2] = 0;
 }

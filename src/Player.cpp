@@ -58,6 +58,8 @@ void Player::handleInput(const Map &map, const sf::Window &window, float dt)
     posX = (posX + oldPosX) / 2;
     posY = (posY + oldPosY) / 2;
 
+    sf::Listener::setPosition(posX, posY, 0);
+
     // Handle mouse movement
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     int mouseXDelta = mousePosition.x - window.getSize().x / 2;
@@ -79,6 +81,8 @@ void Player::handleMouseMovement(int mouseXDelta, const sf::Window &window, floa
     double oldPlaneX = planeX;
     planeX = planeX * cos(actualRotSpeed) - planeY * sin(actualRotSpeed);
     planeY = oldPlaneX * sin(actualRotSpeed) + planeY * cos(actualRotSpeed);
+
+    sf::Listener::setDirection(dirX, dirY, 0);
 }
 
 double Player::getPosX() const { return posX; }

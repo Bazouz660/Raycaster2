@@ -1,11 +1,15 @@
 #include "EnemyEntity.hpp"
 #include <cmath>
 #include <iostream>
+#include "YPI/data.hpp"
 
 EnemyEntity::EnemyEntity(double x, double y, const sf::Texture &texture, const Player &player, const Map &map)
     : AEntity(x, y, texture), player(player), map(map)
 {
     speed = 2.f;
+    //sound->setLoop(true);
+    //sound->setRelativeToListener(true);
+    //sound->setAttenuation(1);
 }
 
 void EnemyEntity::update(float dt) {
@@ -31,4 +35,6 @@ void EnemyEntity::update(float dt) {
 
     x += velocity.x;
     y += velocity.y;
+
+    //sound->setPosition(x, y, 0);
 }

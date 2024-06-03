@@ -3,6 +3,7 @@
 
 #include "Map.hpp"
 #include <SFML/Window.hpp>
+#include <SFML/Audio.hpp>
 
 class Player
 {

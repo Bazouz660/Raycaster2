@@ -3,6 +3,7 @@
 #include "EnemyEntity.hpp"
 #include "imgui-SFML.h"
 #include <imgui.h>
+#include "YPI/data.hpp"
 
 bool my_tool_active = true;
 float my_color[4] = { 0.4f, 0.7f, 0.0f, 0.5f };
@@ -14,7 +15,7 @@ Game &Game::getInstance()
 }
 
 Game::Game() :
-      player(20.5, 13.0, -1.0, 0.0, 0.0, 0.66),
+      player(0.5, 0.5, -1.0, 0.0, 0.0, 0.66),
       map()
 {
     window.create(sf::VideoMode(screenWidth, screenHeight), "Raycasting");
@@ -28,6 +29,16 @@ Game::Game() :
     io.Fonts->AddFontFromFileTTF("asset/arial.ttf", 16.0f);
     ImGui::SFML::UpdateFontTexture();
 
+    ypi::ResourceManager::loadFromFolder(ypi::ResourceType::SoundBuffer, "asset/sound");
+    ypi::ResourceManager::waitForLoading();
+
+    auto sound = ypi::SoundManager::playSound("zombie_mono");
+    sound->setLoop(true);
+    sound->setRelativeToListener(true);
+    sound->setMinDistance(3.f);
+    sound->setAttenuation(0.8f);
+    sound->setPosition(0.5, 0.5, 0);
+
     raycastViewport.create(resolutionX, resolutionY);
 
     raycaster.setSize(resolutionX, resolutionY);
@@ -35,7 +46,7 @@ Game::Game() :
     sf::Texture* entityTexture = new sf::Texture();
     entityTexture->loadFromFile("asset/entity.png");
 
-    EnemyEntity entity1(20.0, 12.0, *entityTexture, player, map);
+    EnemyEntity entity1(0.5, 0.5, *entityTexture, player, map);
     addEntity(std::make_shared<EnemyEntity>(entity1));
 }
 
@@ -51,7 +62,7 @@ void Game::unlockMouse()
     mouseLocked = false;
 }
 
-void Game::computeDeltaTime()
+void Game::profileFrameTime()
 {
     static float lastFrameTime = 0.0f;
     float currentFrameTime = clock.getElapsedTime();
@@ -71,7 +82,6 @@ void Game::computeDeltaTime()
         }
         avgFps = int(1.0f / (sum / 100.0f));
     }
-
 
     lastFrameTime = currentFrameTime;
     frameCounter = (frameCounter + 1) % 100;
@@ -104,8 +114,10 @@ void Game::processEvents()
 
 void Game::update()
 {
-    computeDeltaTime();
+    profileFrameTime();
     ImGui::SFML::Update(window, sf::seconds(dt));
+    ypi::SoundManager::update();
+
     for (auto &entity : entities) {
         entity->update(dt);
     }
@@ -134,6 +146,7 @@ void Game::updateGUI()
 {
     // ImGui window to display current fps, average fps, max fps, min fps, frame time, and a frame time graph
     ImGui::Begin("Stats", &my_tool_active, ImGuiWindowFlags_NoResize);
+    ImGui::SetWindowPos(ImVec2(0, 0));
     ImGui::Text("Current FPS: %d", fps);
     ImGui::Text("Average FPS: %d", avgFps);
     ImGui::Text("Max FPS: %d", maxFps);

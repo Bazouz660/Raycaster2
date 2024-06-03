@@ -28,7 +28,7 @@ private:
     void lockMouse();
     void unlockMouse();
 
-    void computeDeltaTime();
+    void profileFrameTime();
 
     void addEntity(const std::shared_ptr<AEntity> &entity);
 
