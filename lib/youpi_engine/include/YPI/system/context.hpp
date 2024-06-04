@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../../lib_headers/common.hpp"
-#include "../window/Window.hpp"
+#include "../graphics/window/Window.hpp"
 
 namespace ypi
 {

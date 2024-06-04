@@ -46,7 +46,8 @@ private:
     bool mouseLocked = true;
 
     float dt = 0.0f;
-    float frameTimes[100];
+    unsigned int frameSamples = 100;
+    std::vector<float> frameTimes;
     int frameCounter = 0;
 
     int fps = 0;

@@ -15,11 +15,14 @@ Game &Game::getInstance()
 }
 
 Game::Game() :
-      player(0.5, 0.5, -1.0, 0.0, 0.0, 0.66),
+      player(1.5, 1.5, -1.0, 0.0, 0.0, 0.66),
       map()
 {
     window.create(sf::VideoMode(screenWidth, screenHeight), "Raycasting");
     lockMouse();
+
+    frameSamples = 300;
+    frameTimes.resize(frameSamples);
 
     ImGui::SFML::Init(window);
     // set ImGui style
@@ -46,7 +49,7 @@ Game::Game() :
     sf::Texture* entityTexture = new sf::Texture();
     entityTexture->loadFromFile("asset/entity.png");
 
-    EnemyEntity entity1(0.5, 0.5, *entityTexture, player, map);
+    EnemyEntity entity1(1.5, 1.5, *entityTexture, player, map);
     addEntity(std::make_shared<EnemyEntity>(entity1));
 }
 
@@ -65,26 +68,30 @@ void Game::unlockMouse()
 void Game::profileFrameTime()
 {
     static float lastFrameTime = 0.0f;
+    static float timer = 0.0f;
     float currentFrameTime = clock.getElapsedTime();
     dt = currentFrameTime - lastFrameTime;
+
+    timer += dt;
 
     fps = int(1.0f / dt);
     maxFps = std::max(maxFps, fps);
 
     frameTimes[frameCounter] = dt;
 
-    if (frameCounter == 99) {
+    if (timer >= 0.5f) {
+        timer = 0.0f;
         float sum = 0.0f;
         minFps = 5000000;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < frameSamples; i++) {
             sum += frameTimes[i];
             minFps = std::min(minFps, int(1.0f / frameTimes[i]));
         }
-        avgFps = int(1.0f / (sum / 100.0f));
+        avgFps = int(1.0f / (sum / frameSamples));
     }
 
     lastFrameTime = currentFrameTime;
-    frameCounter = (frameCounter + 1) % 100;
+    frameCounter = (frameCounter + 1) % frameSamples;
 }
 
 void Game::run()
@@ -152,7 +159,16 @@ void Game::updateGUI()
     ImGui::Text("Max FPS: %d", maxFps);
     ImGui::Text("Min FPS: %d", minFps);
     ImGui::Text("Frame Time: %f", dt);
-    ImGui::PlotLines("Frame Times", frameTimes, IM_ARRAYSIZE(frameTimes), 0, NULL, 0.0f, 0.02f, ImVec2(0, 80));
+    ImGui::PlotLines("", frameTimes.data(), frameTimes.size(), frameCounter, "", 0.0f, 0.1f, ImVec2(100, 80));
+    ImGui::End();
+
+    // Player health bar
+    ImGui::Begin("Player", &my_tool_active, ImGuiWindowFlags_NoResize);
+    ImGui::SetWindowPos(ImVec2(screenHeight, 100));
+    ImGui::Text("Health: %d", 100);
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(7.0f, 0.0f, 0.0f, 1.0f));
+    ImGui::ProgressBar(100.f / 100.0f, ImVec2(100, 0));
+    ImGui::PopStyleColor();
     ImGui::End();
 }
 

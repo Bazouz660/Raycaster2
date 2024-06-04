@@ -1,14 +1,15 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
-#include <vector>
 #include <SFML/Graphics.hpp>
-#include "TextureMap.hpp"
+#include <vector>
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>
 #include <cmath>
 #include <algorithm>
+
+#include "TextureMap.hpp"
 
 struct Point {
     int x, y;

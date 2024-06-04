@@ -91,8 +91,12 @@ void Raycaster::performDDA(const Player &player, const Map &map, int &x, Ray &ra
             ray.mapY += ray.stepY;
             ray.side = 1;
         }
-        if (map.levelData[0][ray.mapX][ray.mapY] > 0)
+        // Ensure ray.mapX and ray.mapY are within map boundaries
+        if (ray.mapX < 0 || ray.mapX >= map.width || ray.mapY < 0 || ray.mapY >= map.height) {
             hit = 1;
+        } else if (map.levelData[0][ray.mapX][ray.mapY] > 0) {
+            hit = 1;
+        }
     }
 
     if (ray.side == 0) ray.perpWallDist = (ray.mapX - player.getPosX() + (1 - ray.stepX) / 2) / ray.dirX;

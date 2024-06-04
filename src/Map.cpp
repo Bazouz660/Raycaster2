@@ -4,11 +4,12 @@
 #include <unordered_map>
 #include <stack>
 #include <random>
+#include "YPI/system.hpp"
 
 Map::Map() : textureMap(16, 16)
 {
     // Simple map initialization with texture IDs
-    int tempWallData[24][24] =
+    int tempWallData[width][height] =
     {
         {6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6},
         {6,0,0,0,6,0,6,0,0,0,0,0,6,0,0,6,0,0,0,0,6,0,0,6},
@@ -113,7 +114,7 @@ Map::Map() : textureMap(16, 16)
         }
     }
 
-    //generateCorridor(50);
+    generateCorridor(500);
 
     // Load the texture map
     textureMap.loadFromFile("asset/texture_map.png");
@@ -126,6 +127,8 @@ bool Map::isEmpty(int x, int y) const
 
 int Map::getTextureID(int x, int y, int level) const
 {
+    if (x < 0 || x >= width || y < 0 || y >= height)
+        ypi::logger::error() << "Invalid map coordinates: " << x << ", " << y;
     return levelData[level][x][y] - 1;
 }
 
@@ -172,7 +175,24 @@ bool Map::hasLineOfSight(const Point &from, const Point &to) const
     return true;
 }
 
-std::vector<Point> Map::aStar(Point start, Point goal) const {
+std::vector<Point> Map::aStar(Point start, Point goal) const
+{
+    // check if the start and goal are valid
+    if (!isEmpty(start.x, start.y) || !isEmpty(goal.x, goal.y)) {
+        return {};
+    }
+
+    // check if the start and goal are the same
+    if (start == goal) {
+        return {start};
+    }
+
+    // check if the start and goal and inside the map
+    if (start.x < 0 || start.x >= width || start.y < 0 || start.y >= height ||
+        goal.x < 0 || goal.x >= width || goal.y < 0 || goal.y >= height) {
+        return {};
+    }
+
     std::priority_queue<Point> openSet;
     std::unordered_set<Point> closedSet;
     std::unordered_map<Point, Point> cameFrom;
@@ -255,11 +275,11 @@ void Map::generateMaze() {
     }
 }
 
-// generate a corridor map with a given length
+// generate a closed corridor map with a given length (basically a hollow rectangle)
 void Map::generateCorridor(unsigned int length)
 {
-    width = length * 3;
-    height = 3;
+    this->width = length;
+    this->height = 3;
 
     levelData.resize(3);
 
@@ -276,30 +296,15 @@ void Map::generateCorridor(unsigned int length)
     {
         for (int j = 0; j < height; ++j)
         {
-            levelData[0][i][j] = 0;
+            levelData[0][i][j] = 6;
             levelData[1][i][j] = 5;
             levelData[2][i][j] = 6;
         }
     }
 
-    for (int i = 0; i < length; ++i)
+    // cut a path in the middle of the map
+    for (int i = 1; i < width -1; ++i)
     {
-        levelData[0][i][1] = 6;
-        levelData[0][i][2] = 6;
+        levelData[0][i][1] = 0;
     }
-
-    levelData[0][length][1] = 0;
-    levelData[0][length][2] = 0;
-
-    levelData[0][length + 1][1] = 6;
-    levelData[0][length + 1][2] = 6;
-
-    for (int i = length + 2; i < width; ++i)
-    {
-        levelData[0][i][1] = 6;
-        levelData[0][i][2] = 6;
-    }
-
-    levelData[0][width - 1][1] = 0;
-    levelData[0][width - 1][2] = 0;
 }
