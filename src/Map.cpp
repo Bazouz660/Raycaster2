@@ -139,109 +139,82 @@ const TextureMap &Map::getTextureMap() const
 }
 
 // Cast a ray from point 'from' to point 'to' and return false if it hits a wall (line of sight test)
-bool Map::hasLineOfSight(const sf::Vector2f &fromf, const sf::Vector2f &tof) const
+bool Map::hasLineOfSight(const sf::Vector2f &from, const sf::Vector2f &to) const
 {
-    Point from{static_cast<int>(fromf.x), static_cast<int>(fromf.y)};
-    Point to{static_cast<int>(tof.x), static_cast<int>(tof.y)};
+    float dx = to.x - from.x;
+    float dy = to.y - from.y;
+    float steps = std::max(abs(dx), abs(dy));
 
-    // Bresenham's line algorithm
-    int x0 = from.x;
-    int y0 = from.y;
-    int x1 = to.x;
-    int y1 = to.y;
+    float xIncrement = dx / steps;
+    float yIncrement = dy / steps;
 
-    int dx = std::abs(x1 - x0);
-    int dy = std::abs(y1 - y0);
-    int sx = x0 < x1 ? 1 : -1;
-    int sy = y0 < y1 ? 1 : -1;
-    int err = dx - dy;
+    float x = from.x;
+    float y = from.y;
 
-    while (x0 != x1 || y0 != y1)
-    {
-        if (!isEmpty(x0, y0))
-        {
+    for (int i = 0; i <= steps; i++) {
+        if (!isEmpty(std::floor(x), std::floor(y))) {
             return false;
         }
-
-        int e2 = 2 * err;
-        if (e2 > -dy)
-        {
-            err -= dy;
-            x0 += sx;
-        }
-        if (e2 < dx)
-        {
-            err += dx;
-            y0 += sy;
-        }
+        x += xIncrement;
+        y += yIncrement;
     }
 
     return true;
 }
 
-std::vector<Point> Map::aStar(sf::Vector2f startf, sf::Vector2f goalf) const
-{
-    Point start{static_cast<int>(startf.x), static_cast<int>(startf.y)};
-    Point goal{static_cast<int>(goalf.x), static_cast<int>(goalf.y)};
-
-    // check if the start and goal are valid
-    if (!isEmpty(start.x, start.y) || !isEmpty(goal.x, goal.y)) {
-        return {};
+std::vector<Point> Map::getNeighbors(const Point& current) const {
+    std::vector<Point> neighbors;
+    // Define your logic to find neighbors
+    // Example: Consider neighbors within a radius
+    float radius = 1.0; // Define your radius based on game logic
+    int steps = 8; // Number of directions to check
+    for (int i = 0; i < steps; i++) {
+        float angle = 2 * std::numbers::pi * i / steps;
+        Point neighbor{current.x + radius * std::cos(angle), current.y + radius * std::sin(angle)};
+        if (isEmpty(neighbor.x, neighbor.y)) {
+            neighbors.push_back(neighbor);
+        }
     }
+    return neighbors;
+}
 
-    // check if the start and goal are the same
-    if (start == goal) {
-        return {start};
-    }
-
-    // check if the start and goal and inside the map
-    if (start.x < 0 || start.x >= width || start.y < 0 || start.y >= height ||
-        goal.x < 0 || goal.x >= width || goal.y < 0 || goal.y >= height) {
-        return {};
-    }
-
-    std::priority_queue<Point> openSet;
-    std::unordered_set<Point> closedSet;
+std::vector<Point> Map::aStar(const Point& start, const Point& goal) const {
+    std::priority_queue<std::pair<float, Point>, std::vector<std::pair<float, Point>>, std::greater<>> openSet;
     std::unordered_map<Point, Point> cameFrom;
+    std::unordered_map<Point, float> gScore;
+    std::unordered_map<Point, float> fScore;
 
-    std::unordered_map<Point, double> gScore;
-    gScore[start] = 0;
-
-    std::unordered_map<Point, double> fScore;
+    gScore[start] = 0.0;
     fScore[start] = heuristic(start, goal);
-
-    openSet.push(start);
+    openSet.emplace(fScore[start], start);
 
     while (!openSet.empty()) {
-        Point current = openSet.top();
+        Point current = openSet.top().second;
         if (current == goal) {
             std::vector<Point> path;
-            while (current != start) {
+            while (cameFrom.find(current) != cameFrom.end()) {
                 path.push_back(current);
                 current = cameFrom[current];
             }
+            path.push_back(start);
             std::reverse(path.begin(), path.end());
             return path;
         }
 
         openSet.pop();
-        closedSet.insert(current);
 
-        // Neighbors could be defined by your game logic
-        for (Point neighbor : {Point{-1, 0}, Point{1, 0}, Point{0, -1}, Point{0, 1}}) {
-            Point next = current + neighbor;
-            if (!isEmpty(next.x, next.y) || closedSet.find(next) != closedSet.end()) continue;
-
-            double tentative_gScore = gScore[current] + 1; // Assuming cost between neighboring nodes is 1
-            if (!gScore.count(next) || tentative_gScore < gScore[next]) {
-                cameFrom[next] = current;
-                gScore[next] = tentative_gScore;
-                fScore[next] = gScore[next] + heuristic(next, goal);
-                openSet.push(next);
+        for (const Point& neighbor : getNeighbors(current)) {
+            float tentative_gScore = gScore[current] + heuristic(current, neighbor);
+            if (tentative_gScore < gScore[neighbor] || gScore.find(neighbor) == gScore.end()) {
+                cameFrom[neighbor] = current;
+                gScore[neighbor] = tentative_gScore;
+                fScore[neighbor] = tentative_gScore + heuristic(neighbor, goal);
+                openSet.emplace(fScore[neighbor], neighbor);
             }
         }
     }
-    return {}; // return empty path if no path is found
+
+    return {}; // No path found
 }
 
 void Map::generateMaze() {

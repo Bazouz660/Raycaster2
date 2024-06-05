@@ -12,7 +12,7 @@
 #include "TextureMap.hpp"
 
 struct Point {
-    int x, y;
+    float x, y;
 
     bool operator==(const Point& o) const { return x == o.x && y == o.y; }
     bool operator!=(const Point& o) const { return !(*this == o); }
@@ -43,7 +43,9 @@ public:
     bool isEmpty(int x, int y) const;
     int getTextureID(int x, int y, int level) const;
     const TextureMap &getTextureMap() const;
-    std::vector<Point> aStar(sf::Vector2f startf, sf::Vector2f goalf) const;
+
+    std::vector<Point> getNeighbors(const Point& current) const;
+    std::vector<Point> aStar(const Point& start, const Point& goal) const;
 
     // Cast a ray from point 'from' to point 'to' and return true if it hits a wall (line of sight test)
     bool hasLineOfSight(const sf::Vector2f &fromf, const sf::Vector2f &tof) const;
@@ -58,7 +60,7 @@ private:
     TextureMap textureMap;
 
     double heuristic(Point a, Point b) const {
-        return std::sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+        return std::hypot(b.x - a.x, b.y - a.y);
     }
 
     void generateMaze();

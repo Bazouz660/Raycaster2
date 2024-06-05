@@ -23,7 +23,7 @@ void EnemyEntity::update(float dt) {
     } else if (map.hasLineOfSight(enemyPos, playerPos)) {
         rigidbody.setDirection(ypi::Vector2f(playerPos.x - enemyPos.x, playerPos.y - enemyPos.y));
     } else {
-        std::vector<Point> path = map.aStar(enemyPos, playerPos);
+        std::vector<Point> path = map.aStar({enemyPos.x, enemyPos.y}, {playerPos.x, playerPos.y});
         if (!path.empty()) {
             // move to the first point in the path
             Point nextStep = path.front();
