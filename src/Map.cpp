@@ -114,7 +114,8 @@ Map::Map() : textureMap(16, 16)
         }
     }
 
-    generateCorridor(500);
+    //generateCorridor(500);
+    //generateMaze();
 
     // Load the texture map
     textureMap.loadFromFile("asset/texture_map.png");
@@ -138,8 +139,11 @@ const TextureMap &Map::getTextureMap() const
 }
 
 // Cast a ray from point 'from' to point 'to' and return false if it hits a wall (line of sight test)
-bool Map::hasLineOfSight(const Point &from, const Point &to) const
+bool Map::hasLineOfSight(const sf::Vector2f &fromf, const sf::Vector2f &tof) const
 {
+    Point from{static_cast<int>(fromf.x), static_cast<int>(fromf.y)};
+    Point to{static_cast<int>(tof.x), static_cast<int>(tof.y)};
+
     // Bresenham's line algorithm
     int x0 = from.x;
     int y0 = from.y;
@@ -175,8 +179,11 @@ bool Map::hasLineOfSight(const Point &from, const Point &to) const
     return true;
 }
 
-std::vector<Point> Map::aStar(Point start, Point goal) const
+std::vector<Point> Map::aStar(sf::Vector2f startf, sf::Vector2f goalf) const
 {
+    Point start{static_cast<int>(startf.x), static_cast<int>(startf.y)};
+    Point goal{static_cast<int>(goalf.x), static_cast<int>(goalf.y)};
+
     // check if the start and goal are valid
     if (!isEmpty(start.x, start.y) || !isEmpty(goal.x, goal.y)) {
         return {};

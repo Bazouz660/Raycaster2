@@ -6,6 +6,8 @@
 #include <SFML/Audio.hpp>
 #include <memory>
 
+#include "entity_component/Rigidbody.hpp"
+
 class EnemyEntity : public AEntity
 {
     public:
@@ -17,7 +19,5 @@ class EnemyEntity : public AEntity
         const Player &player;
         const Map &map;
         float speed = 1.0f;
-        Vector2f direction;
-        Vector2f velocity;
-        std::shared_ptr<sf::Sound> sound;
+        Rigidbody rigidbody;
 };

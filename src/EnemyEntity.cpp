@@ -13,28 +13,31 @@ EnemyEntity::EnemyEntity(double x, double y, const sf::Texture &texture, const P
 }
 
 void EnemyEntity::update(float dt) {
-    Point playerPos = {player.getPosX(), player.getPosY()};
-    Point enemyPos = {x, y};
+    ypi::Vector2f playerPos(player.getPosX(), player.getPosY());
+    ypi::Vector2f enemyPos(x, y);
     double distance = std::sqrt((playerPos.x - enemyPos.x) * (playerPos.x - enemyPos.x) + (playerPos.y - enemyPos.y) * (playerPos.y - enemyPos.y));
+
     if (distance < 1.0) {
-        direction = {0, 0};
+        rigidbody.setDirection({0, 0});
         //player.damage(1);
     } else if (map.hasLineOfSight(enemyPos, playerPos)) {
-        direction = {playerPos.x - enemyPos.x, playerPos.y - enemyPos.y};
+        rigidbody.setDirection(ypi::Vector2f(playerPos.x - enemyPos.x, playerPos.y - enemyPos.y));
     } else {
         std::vector<Point> path = map.aStar(enemyPos, playerPos);
         if (!path.empty()) {
             // move to the first point in the path
             Point nextStep = path.front();
-            direction = {nextStep.x - enemyPos.x, nextStep.y - enemyPos.y};
+            rigidbody.setDirection(ypi::Vector2f(nextStep.x - enemyPos.x, nextStep.y - enemyPos.y));
         }
     }
-    direction = direction.normalize();
-    velocity.x = speed * direction.x * dt;
-    velocity.y = speed * direction.y * dt;
 
-    x += velocity.x;
-    y += velocity.y;
+    rigidbody.accelerate(speed);
+    rigidbody.update(dt);
+
+    x += rigidbody.getVelocity().x;
+    y += rigidbody.getVelocity().y;
+
+    rigidbody.setVelocity({0, 0});
 
     //sound->setPosition(x, y, 0);
 }

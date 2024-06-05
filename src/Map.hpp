@@ -43,10 +43,10 @@ public:
     bool isEmpty(int x, int y) const;
     int getTextureID(int x, int y, int level) const;
     const TextureMap &getTextureMap() const;
-    std::vector<Point> aStar(Point start, Point goal) const;
+    std::vector<Point> aStar(sf::Vector2f startf, sf::Vector2f goalf) const;
 
     // Cast a ray from point 'from' to point 'to' and return true if it hits a wall (line of sight test)
-    bool hasLineOfSight(const Point &from, const Point &to) const;
+    bool hasLineOfSight(const sf::Vector2f &fromf, const sf::Vector2f &tof) const;
 
     using MapData = std::vector<std::vector<int>>;
 
